@@ -3,52 +3,50 @@ package com.web.cloud.controller;
 import com.web.cloud.dto.WrapperResponse;
 import com.web.cloud.entities.Pay;
 import com.web.cloud.entities.PayDTO;
-import com.web.cloud.service.PayService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @RestController
-@Tag(name = "支付微服务模块",description = "支付CRUD")
-public class PayController{
+@Tag(name = "订单微服务模块",description = "订单CRUD")
+public class OrderController {
     @Resource
-    PayService payService;
-    @PostMapping(value = "/pay/add")
+    RestTemplate restTemplate;
+
+    private static String PAY_URL = "http://localhost:8001";
+
+    @PostMapping(value = "/order/add")
     @Operation(summary = "新增",description = "新增支付流水方法,json串做参数")
     public WrapperResponse<String> addPay(@RequestBody Pay pay){
         System.out.println(pay.toString());
-        int i = payService.add(pay);
-        return WrapperResponse.success("成功插入记录，返回值："+i);
+        return restTemplate.postForObject(PAY_URL+"/pay/add",pay, WrapperResponse.class);
     }
-    @DeleteMapping(value = "/pay/del/{id}")
+    @DeleteMapping(value = "/order/del/{id}")
     @Operation(summary = "删除",description = "删除支付流水方法")
     public WrapperResponse<Integer> deletePay(@PathVariable("id") Integer id) {
-        return WrapperResponse.success(payService.delete(id));
+        return restTemplate.postForObject(PAY_URL+"/pay/del/"+id,id, WrapperResponse.class);
     }
-    @PutMapping(value = "/pay/update")
+    @PutMapping(value = "/order/update")
     @Operation(summary = "修改",description = "修改支付流水方法")
     public WrapperResponse<String> updatePay(@RequestBody PayDTO payDTO){
-        Pay pay = new Pay();
-        BeanUtils.copyProperties(payDTO, pay);
-
-        int i = payService.update(pay);
-        return WrapperResponse.success("成功修改记录，返回值："+i);
+        return  restTemplate.postForObject(PAY_URL+"/pay/update",payDTO, WrapperResponse.class);
     }
-    @GetMapping(value = "/pay/get/{id}")
+    @GetMapping(value = "/order/get/{id}")
     @Operation(summary = "按照ID查流水",description = "查询支付流水方法")
     public WrapperResponse<Pay> getById(@PathVariable("id") Integer id){
         if (id < 0) throw new RuntimeException("ID不能为负数");
-        return WrapperResponse.success(payService.getById(id));
+        return restTemplate.getForObject(PAY_URL+"/pay/get/"+id,WrapperResponse.class,id);
     }
 
-    @GetMapping(value = "/pay/getAll")
+    @GetMapping(value = "/order/getAll")
     @Operation(summary = "查询全部流水",description = "查询全部支付流水方法")
     public WrapperResponse<List<Pay>> getAll(){
-        return WrapperResponse.success(payService.getAll());
+        return  restTemplate.getForObject(PAY_URL+"/pay/getAll", WrapperResponse.class);
     }
 }
 

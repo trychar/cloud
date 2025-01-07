@@ -16,7 +16,9 @@
 	<modules>
 		<module>com-web-cloud-mybatisGenerator</module>
 		<module>com-web-cloud-payment</module>
-	</modules>
+        <module>com-web-cloud-order80</module>
+        <module>com-web-cloud-api-common</module>
+    </modules>
 	<!--	在父级项目中的pom.xml文件使用的packaging配置一定为pom。
     父级的pom文件只作项目的子模块的整合，在maven install时不会生成jar/war压缩包。-->
 	<packaging>pom</packaging>
